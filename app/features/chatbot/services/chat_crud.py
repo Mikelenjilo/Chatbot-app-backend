@@ -1,72 +1,10 @@
-"""
-CRUD (Create, Read, Update, Delete) operations for database models.
-These functions handle all database interactions.
-"""
-
-from datetime import datetime
-from typing import List, Optional
+from typing import Optional, List
 from sqlalchemy.orm import Session
-import hashlib
-import secrets
-from app.models.user_model import User
-from app.models.chat_model import Chat
-from app.models.message_model import Message
-from app import schemas
-from app.enums import SenderType
+from datetime import datetime
 
-
-# User CRUD operations
-def get_user(db: Session, user_id: int) -> Optional[User]:
-    """Get a user by ID."""
-    return db.query(User).filter(User.id == user_id).first()
-
-
-def get_user_by_username(db: Session, username: str) -> Optional[User]:
-    """Get a user by username."""
-    return db.query(User).filter(User.username == username).first()
-
-
-def get_user_by_email(db: Session, email: str) -> Optional[User]:
-    """Get a user by email."""
-    return db.query(User).filter(User.email == email).first()
-
-
-def hash_password(password: str) -> str:
-    """Hash a password with salt."""
-    salt = secrets.token_hex(16)
-    password_hash = hashlib.sha256((password + salt).encode()).hexdigest()
-    return f"{salt}:{password_hash}"
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash."""
-    try:
-        salt, password_hash = hashed_password.split(":")
-        return hashlib.sha256((plain_password + salt).encode()).hexdigest() == password_hash
-    except ValueError:
-        return False
-
-
-def create_user(db: Session, user: schemas.UserCreate) -> User:
-    """Create a new user."""
-    hashed_password = hash_password(user.password)
-    db_user = User(
-        username=user.username,
-        email=user.email,
-        hashed_password=hashed_password
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
-def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
-    """Authenticate a user by username and password."""
-    user = get_user_by_username(db, username)
-    if not user or not verify_password(password, user.hashed_password):
-        return None
-    return user
+from app.features.chatbot.models.chat_model import Chat
+from app.features.chatbot.models.message_model import Message
+from app.core.enums import SenderType
 
 
 # Chat CRUD operations

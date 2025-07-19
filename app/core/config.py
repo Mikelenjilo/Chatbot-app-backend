@@ -3,8 +3,6 @@ Configuration settings for the chatbot application.
 This file manages all environment variables and app settings.
 """
 
-import os
-from typing import Optional
 from pydantic_settings import BaseSettings
 
 
@@ -20,15 +18,8 @@ class Settings(BaseSettings):
     # Database settings
     database_url: str = "sqlite:///./chatbot.db"
     
-    # AI Service Selection (ollama, huggingface, openai)
+    # AI Service Selection (ollama)
     ai_service: str = "ollama" 
-    
-    # OpenAI settings (if using OpenAI)
-    openai_api_key: Optional[str] = None
-    openai_model: str = "gpt-3.5-turbo"
-    
-    # Hugging Face settings (optional token for better rate limits)
-    huggingface_token: Optional[str] = None
     
     # Security settings
     secret_key: str = "your-secret-key-change-this-in-production"

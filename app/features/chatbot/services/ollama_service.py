@@ -5,7 +5,7 @@ Completely free alternative to OpenAI.
 
 import httpx
 from typing import List, Dict
-from app.enums import SenderType
+from app.core.enums import SenderType
 
 class OllamaService:
     """
@@ -31,6 +31,7 @@ class OllamaService:
         try:
             # Prepare the context
             context = self._prepare_context(message, chat_history)
+            print(f"Context: {context}")
             
             # Call Ollama API
             response = httpx.post(
@@ -42,6 +43,7 @@ class OllamaService:
                 },
                 timeout=60.0
             )
+            print(f"Response: {response}")
             
             if response.status_code == 200:
                 result = response.json()
@@ -100,24 +102,23 @@ class OllamaService:
                     "prompt": prompt,
                     "stream": False
                 },
-                timeout=30.0
             )
             
             if response.status_code == 200:
                 result = response.json()
                 title = result.get("response", "").strip()
-                return title if title else f"Chat about {first_message[:30]}..."
+                return title if title else f"{first_message[:30]}..."
             else:
-                return f"Chat about {first_message[:30]}..."
+                return f"{first_message[:30]}..."
                 
         except Exception as e:
             print(f"Error generating chat title: {type(e).__name__}: {e}")
-            return f"Chat about {first_message[:30]}..."
+            return f"{first_message[:30]}..."
 
     def check_connection(self) -> bool:
         """Check if Ollama is running and accessible."""
         try:
-            response = httpx.get(f"{self.base_url}/api/tags", timeout=5.0)
+            response = httpx.get(f"{self.base_url}/api/tags")
             return response.status_code == 200
         except:
             return False

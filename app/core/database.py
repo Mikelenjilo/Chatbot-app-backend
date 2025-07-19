@@ -6,7 +6,7 @@ This file sets up SQLAlchemy to work with SQLite.
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from app.config import settings
+from app.core.config import settings
 
 
 # Create the SQLAlchemy engine

@@ -1,8 +1,8 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey, Enum as SqlEnum
 from sqlalchemy.orm import relationship
-from app.database import Base
-from app.enums import SenderType
+from app.core.database import Base
+from app.core.enums import SenderType
 
 
 class Message(Base):
