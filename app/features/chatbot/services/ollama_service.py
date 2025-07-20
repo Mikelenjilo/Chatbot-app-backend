@@ -31,9 +31,8 @@ class OllamaService:
         try:
             # Prepare the context
             context = self._prepare_context(message, chat_history)
-            print(f"Context: {context}")
             
-            # Call Ollama API
+            # Call Ollama API with increased timeout
             response = httpx.post(
                 f"{self.base_url}/api/generate",
                 json={
@@ -41,21 +40,22 @@ class OllamaService:
                     "prompt": context,
                     "stream": False
                 },
-                timeout=60.0
+                timeout=120.0  # Increased timeout to 2 minutes
             )
-            print(f"Response: {response}")
             
             if response.status_code == 200:
                 result = response.json()
                 return result.get("response", "Sorry, I couldn't generate a response.")
             else:
-                print(f"Ollama API error: {response.status_code}")
-                return "I'm having trouble connecting to the AI service."
+                return f"I'm having trouble connecting to the AI service. Status: {response.status_code}"
                 
         except httpx.ConnectError:
             return "🔴 Ollama is not running. Please start Ollama first: 'ollama serve'"
+        except httpx.TimeoutException:
+            return "⏰ Request timed out. The model might be taking too long to respond."
+        except httpx.HTTPStatusError as e:
+            return f"HTTP error occurred: {e.response.status_code}"
         except Exception as e:
-            print(f"Error generating response: {type(e).__name__}: {e}")
             return "I apologize, but I'm having trouble generating a response right now."
     
     def _prepare_context(self, message: str, chat_history: List[Dict[str, str]] = None) -> str:
@@ -102,6 +102,7 @@ class OllamaService:
                     "prompt": prompt,
                     "stream": False
                 },
+                timeout=30.0  # Added timeout
             )
             
             if response.status_code == 200:
@@ -112,13 +113,12 @@ class OllamaService:
                 return f"{first_message[:30]}..."
                 
         except Exception as e:
-            print(f"Error generating chat title: {type(e).__name__}: {e}")
             return f"{first_message[:30]}..."
 
     def check_connection(self) -> bool:
         """Check if Ollama is running and accessible."""
         try:
-            response = httpx.get(f"{self.base_url}/api/tags")
+            response = httpx.get(f"{self.base_url}/api/tags", timeout=10.0)
             return response.status_code == 200
         except:
             return False

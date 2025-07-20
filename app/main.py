@@ -192,9 +192,9 @@ async def chat(
         logger.info(f"Bot message: {bot_message}")
         
         # Generate title for new chats
-        if not chat.title and len(chat_history) == 0:
-            title = ai_service.generate_chat_title(chat_request.message)
-            update_chat_title(db, chat.id, title)
+        # if not chat.title and len(chat_history) == 0:
+        #     title = ai_service.generate_chat_title(chat_request.message)
+        #     update_chat_title(db, chat.id, title)
         
         return ChatMessageResponse(
             user_message=user_message,
